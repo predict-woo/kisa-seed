@@ -2,7 +2,7 @@ import Common from "./common";
 import { defaults } from "./defaults";
 import { KISA_ENC_DEC, KISA_SEED_INFO, KISA_SEED_KEY } from "./util";
 
-class KISA_SEED_CBC {
+export class KISA_SEED_CBC {
   private static ENDIAN: number = Common.BIG_ENDIAN;
 
   private static readonly BLOCK_SIZE_SEED: number = 16;
@@ -737,5 +737,3 @@ class KISA_SEED_CBC {
     return KISA_SEED_CBC.uint8ArrayToString(result);
   }
 }
-
-export default KISA_SEED_CBC;
