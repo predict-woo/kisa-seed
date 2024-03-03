@@ -1,0 +1,32 @@
+{
+  "name": "kisa-seed",
+  "version": "1.0.0",
+  "description": "Typescript implementation of the KISA SEED encryption and decryption",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/predict-woo/kisa-seed.git"
+  },
+  "keywords": [
+    "KISA",
+    "SEED",
+    "Encryption",
+    "Decryption",
+    "Typescript"
+  ],
+  "author": "predict-woo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/predict-woo/kisa-seed/issues"
+  },
+  "homepage": "https://github.com/predict-woo/kisa-seed#readme",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.2",
+    "typescript": "^5.3.3"
+  }
+}
