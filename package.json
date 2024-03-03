@@ -2,10 +2,16 @@
   "name": "kisa-seed",
   "version": "1.0.0",
   "description": "Typescript implementation of the KISA SEED encryption and decryption",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "ts-node src/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "build": "tsup"
   },
   "repository": {
     "type": "git",
