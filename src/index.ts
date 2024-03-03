@@ -681,6 +681,61 @@ class KISA_SEED_CBC {
       return new Uint8Array(0);
     }
   }
+
+  private static stringToUint8Array(str: string): Uint8Array {
+    const encoder = new TextEncoder(); // TextEncoder encodes into UTF-8 by default
+    const uint8Array = encoder.encode(str);
+    return uint8Array;
+  }
+
+  private static uint8ArrayToString(uint8Array: Uint8Array): string {
+    const decoder = new TextDecoder("utf-8");
+    return decoder.decode(uint8Array);
+  }
+
+  private static base64ToUint8Array(base64: string): Uint8Array {
+    return new Uint8Array(Buffer.from(base64, "base64"));
+  }
+
+  public static encrypt(
+    pbszUserKey: string,
+    pbszIV: string,
+    message_str: string
+  ): string {
+    const pbszUserKeyUint8Array: Uint8Array =
+      KISA_SEED_CBC.base64ToUint8Array(pbszUserKey);
+    const pbszIVUint8Array: Uint8Array =
+      KISA_SEED_CBC.base64ToUint8Array(pbszIV);
+    const message: Uint8Array = KISA_SEED_CBC.stringToUint8Array(message_str);
+    const result: Uint8Array = KISA_SEED_CBC.SEED_CBC_Encrypt(
+      pbszUserKeyUint8Array,
+      pbszIVUint8Array,
+      message,
+      0,
+      message.length
+    );
+    return btoa(String.fromCharCode(...result));
+  }
+
+  public static decrypt(
+    pbszUserKey: string,
+    pbszIV: string,
+    base64_str: string
+  ): string {
+    const pbszUserKeyUint8Array: Uint8Array =
+      KISA_SEED_CBC.base64ToUint8Array(pbszUserKey);
+    const pbszIVUint8Array: Uint8Array =
+      KISA_SEED_CBC.base64ToUint8Array(pbszIV);
+    const message: Uint8Array = KISA_SEED_CBC.base64ToUint8Array(base64_str);
+    const result: Uint8Array = KISA_SEED_CBC.SEED_CBC_Decrypt(
+      pbszUserKeyUint8Array,
+      pbszIVUint8Array,
+      message,
+      0,
+      message.length
+    );
+    return KISA_SEED_CBC.uint8ArrayToString(result);
+  }
 }
 
 export default KISA_SEED_CBC;
