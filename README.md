@@ -8,6 +8,11 @@ This is a typescript conversion of the Java class mentioned in the above website
 
 Since it is almost a direct translation, it will not follow typescript standards and best practices.
 
+## Installation
+```
+npm install kisa-seed
+```
+
 ## Usage
 
 You can use it in the following way.
