@@ -685,16 +685,18 @@ export class KISA_SEED_CBC {
   private static stringToUint8Array(str: string): Uint8Array {
     const encoder = new TextEncoder(); // TextEncoder encodes into UTF-8 by default
     const uint8Array = encoder.encode(str);
-    return uint8Array;
-  }
 
-  private static uint8ArrayToString(uint8Array: Uint8Array): string {
-    const decoder = new TextDecoder("utf-8");
-    return decoder.decode(uint8Array);
+    return uint8Array;
   }
 
   private static base64ToUint8Array(base64: string): Uint8Array {
     return new Uint8Array(Buffer.from(base64, "base64"));
+  }
+
+  private static uint8ToBase64(uint8Array: Uint8Array): string {
+    const decoder = new TextDecoder("base64");
+
+    return decoder.decode(uint8Array);
   }
 
   public static encrypt(
@@ -734,6 +736,6 @@ export class KISA_SEED_CBC {
       0,
       message.length
     );
-    return KISA_SEED_CBC.uint8ArrayToString(result);
+    return KISA_SEED_CBC.uint8ToBase64(result);
   }
 }
