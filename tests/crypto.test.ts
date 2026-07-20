@@ -1,3 +1,4 @@
+import { expect, test } from "vitest";
 import { KISA_SEED_CBC } from "../src";
 
 test("encrpyt and decrypt", () => {
