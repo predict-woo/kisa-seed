@@ -18,7 +18,7 @@ npm install kisa-seed
 You can use it in the following way.
 
 ```ts
-import { KISA_SEED_CBC } from "../src";
+import { KISA_SEED_CBC } from "kisa-seed";
 
 const enc = KISA_SEED_CBC.encrypt(
   "gONPjwgQcPHp85Q3CtQFiQ==",
@@ -35,10 +35,40 @@ const dec = KISA_SEED_CBC.decrypt(
 console.log(dec);
 ```
 
+> [!NOTE]
+> `encrypt`/`decrypt` are for **UTF-8 text**. `decrypt` throws a `TypeError` if
+> the decrypted plaintext is not valid UTF-8 (e.g. certificates or other binary
+> data), instead of silently corrupting it. For binary payloads use
+> `encryptBytes`/`decryptBytes`.
+
+### Binary data
+
+If your plaintext is binary (files, certificates, etc.), use `encryptBytes` and
+`decryptBytes`, which take the same base64 key/IV but work with `Uint8Array`
+payloads:
+
+```ts
+import { KISA_SEED_CBC } from "kisa-seed";
+
+const data: Uint8Array = new Uint8Array([0x30, 0x82, 0xff, 0xfe]);
+
+const enc = KISA_SEED_CBC.encryptBytes(
+  "gONPjwgQcPHp85Q3CtQFiQ==",
+  "II1mpzCoGoFvutn6NhAlAQ==",
+  data
+); // base64 ciphertext
+
+const dec = KISA_SEED_CBC.decryptBytes(
+  "gONPjwgQcPHp85Q3CtQFiQ==",
+  "II1mpzCoGoFvutn6NhAlAQ==",
+  enc
+); // Uint8Array, byte-identical to data
+```
+
 You can also access an inner method if you want to directly encrypt/decrypt a Uint8Array
 
 ```ts
-import { KISA_SEED_CBC } from "../src";
+import { KISA_SEED_CBC } from "kisa-seed";
 
 function stringToUint8Array(str: string): Uint8Array {
   const encoder = new TextEncoder(); // TextEncoder encodes into UTF-8 by default

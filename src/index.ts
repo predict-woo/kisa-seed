@@ -689,7 +689,9 @@ export class KISA_SEED_CBC {
   }
 
   private static uint8ArrayToString(uint8Array: Uint8Array): string {
-    const decoder = new TextDecoder("utf-8");
+    // fatal: true makes non-UTF-8 plaintext throw instead of being silently
+    // corrupted with U+FFFD replacement characters (issue #1)
+    const decoder = new TextDecoder("utf-8", { fatal: true });
     return decoder.decode(uint8Array);
   }
 
@@ -697,16 +699,28 @@ export class KISA_SEED_CBC {
     return new Uint8Array(Buffer.from(base64, "base64"));
   }
 
+  private static uint8ArrayToBase64(uint8Array: Uint8Array): string {
+    return Buffer.from(uint8Array).toString("base64");
+  }
+
   public static encrypt(
     pbszUserKey: string,
     pbszIV: string,
     message_str: string
   ): string {
+    const message: Uint8Array = KISA_SEED_CBC.stringToUint8Array(message_str);
+    return KISA_SEED_CBC.encryptBytes(pbszUserKey, pbszIV, message);
+  }
+
+  public static encryptBytes(
+    pbszUserKey: string,
+    pbszIV: string,
+    message: Uint8Array
+  ): string {
     const pbszUserKeyUint8Array: Uint8Array =
       KISA_SEED_CBC.base64ToUint8Array(pbszUserKey);
     const pbszIVUint8Array: Uint8Array =
       KISA_SEED_CBC.base64ToUint8Array(pbszIV);
-    const message: Uint8Array = KISA_SEED_CBC.stringToUint8Array(message_str);
     const result: Uint8Array = KISA_SEED_CBC.SEED_CBC_Encrypt(
       pbszUserKeyUint8Array,
       pbszIVUint8Array,
@@ -714,7 +728,26 @@ export class KISA_SEED_CBC {
       0,
       message.length
     );
-    return btoa(String.fromCharCode(...result));
+    return KISA_SEED_CBC.uint8ArrayToBase64(result);
+  }
+
+  public static decryptBytes(
+    pbszUserKey: string,
+    pbszIV: string,
+    base64_str: string
+  ): Uint8Array {
+    const pbszUserKeyUint8Array: Uint8Array =
+      KISA_SEED_CBC.base64ToUint8Array(pbszUserKey);
+    const pbszIVUint8Array: Uint8Array =
+      KISA_SEED_CBC.base64ToUint8Array(pbszIV);
+    const message: Uint8Array = KISA_SEED_CBC.base64ToUint8Array(base64_str);
+    return KISA_SEED_CBC.SEED_CBC_Decrypt(
+      pbszUserKeyUint8Array,
+      pbszIVUint8Array,
+      message,
+      0,
+      message.length
+    );
   }
 
   public static decrypt(
@@ -722,17 +755,10 @@ export class KISA_SEED_CBC {
     pbszIV: string,
     base64_str: string
   ): string {
-    const pbszUserKeyUint8Array: Uint8Array =
-      KISA_SEED_CBC.base64ToUint8Array(pbszUserKey);
-    const pbszIVUint8Array: Uint8Array =
-      KISA_SEED_CBC.base64ToUint8Array(pbszIV);
-    const message: Uint8Array = KISA_SEED_CBC.base64ToUint8Array(base64_str);
-    const result: Uint8Array = KISA_SEED_CBC.SEED_CBC_Decrypt(
-      pbszUserKeyUint8Array,
-      pbszIVUint8Array,
-      message,
-      0,
-      message.length
+    const result: Uint8Array = KISA_SEED_CBC.decryptBytes(
+      pbszUserKey,
+      pbszIV,
+      base64_str
     );
     return KISA_SEED_CBC.uint8ArrayToString(result);
   }

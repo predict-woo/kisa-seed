@@ -60,3 +60,40 @@ test("encrpyt and decrypt", () => {
   const decStr = uint8ArrayToString(dec);
   expect(decStr).toBe("Hello World");
 });
+
+// --- Issue #1: binary plaintext must survive the convenience API ---
+
+const KEY = "gONPjwgQcPHp85Q3CtQFiQ==";
+const IV = "II1mpzCoGoFvutn6NhAlAQ==";
+
+test("encryptBytes/decryptBytes round-trips binary (non-UTF-8) data", () => {
+  // DER-like bytes, deliberately invalid as UTF-8
+  const binary = new Uint8Array([
+    0x30, 0x82, 0x01, 0x0a, 0xc3, 0x28, 0xff, 0xfe, 0x80, 0x9f, 0x00, 0x41,
+  ]);
+
+  const enc = KISA_SEED_CBC.encryptBytes(KEY, IV, binary);
+  const dec = KISA_SEED_CBC.decryptBytes(KEY, IV, enc);
+
+  expect(Buffer.from(dec).equals(Buffer.from(binary))).toBe(true);
+});
+
+test("encryptBytes matches encrypt for UTF-8 input", () => {
+  const bytes = new TextEncoder().encode("Hello World");
+  expect(KISA_SEED_CBC.encryptBytes(KEY, IV, bytes)).toBe(
+    "MWeccStERpJIdUKd5nesKA=="
+  );
+});
+
+test("decrypt throws on binary plaintext instead of silently corrupting", () => {
+  const binary = new Uint8Array([0x30, 0x82, 0xc3, 0x28, 0xff, 0xfe]);
+  const enc = KISA_SEED_CBC.encryptBytes(KEY, IV, binary);
+
+  expect(() => KISA_SEED_CBC.decrypt(KEY, IV, enc)).toThrow();
+});
+
+test("encrypt/decrypt handles large messages (500KB)", () => {
+  const big = "x".repeat(500_000);
+  const enc = KISA_SEED_CBC.encrypt(KEY, IV, big);
+  expect(KISA_SEED_CBC.decrypt(KEY, IV, enc)).toBe(big);
+});
